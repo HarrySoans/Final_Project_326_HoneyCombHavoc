@@ -5,6 +5,8 @@ public class HoneycombGame {
     private static final int INFINITY = Integer.MAX_VALUE;
     private static final int HONEYCOMB_PENALTY = -1;
 
+    static Random random = new Random();
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -12,8 +14,7 @@ public class HoneycombGame {
         System.out.println("Enter the total number of items (fruits + honeycombs):");
         int totalItems = scanner.nextInt();
 
-        Random random = new Random();
-        int honeycombs = random.nextInt(totalItems); // Generate a random number of honeycombs
+        int honeycombs = random.nextInt(totalItems/2); // Generate a random number of honeycombs
 
         // Generate the array representing fruits and honeycombs
         char[] fruitsAndHoneycombs = generateFruitsAndHoneycombs(totalItems, honeycombs);
@@ -29,13 +30,22 @@ public class HoneycombGame {
 
     private static char[] generateFruitsAndHoneycombs(int totalItems, int honeycombs) {
         char[] fruitsAndHoneycombs = new char[totalItems];
-        for (int i = 0; i < totalItems; i++) {
-            if (i < honeycombs) {
-                fruitsAndHoneycombs[i] = 'X'; // Representing honeycombs with 'X'
+        int numHoneycombs = 0;
+        fruitsAndHoneycombs[0] = 'O';
+        for (int i = 1; i < totalItems; i++) {
+            if (numHoneycombs < honeycombs) {
+                int rand = random.nextInt(2);
+                if(rand == 1) {
+                    fruitsAndHoneycombs[i] = 'X'; // Representing honeycombs with 'X'
+                    numHoneycombs++;
+                }else{
+                    fruitsAndHoneycombs[i] = 'O';
+                }
             } else {
-                fruitsAndHoneycombs[i] = '0'; // Representing fruits with '0'
+                fruitsAndHoneycombs[i] = 'O'; // Representing fruits with 'O'
             }
         }
+        fruitsAndHoneycombs[totalItems-1] = 'X';
         return fruitsAndHoneycombs;
     }
 

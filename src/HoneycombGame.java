@@ -10,7 +10,9 @@ public class HoneycombGame {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Welcome to the Honeycomb Game!");
+        System.out.println("Welcome to Honeycomb Havoc!");
+        System.out.println("Try to collect as many fruits without but at the same time avoid the Honeycombs!");
+        System.out.println("The fruits are 0 and the Honeycombs are X");
         System.out.println("Enter the total number of items (fruits + honeycombs):");
         int totalItems = scanner.nextInt();
 
@@ -19,13 +21,68 @@ public class HoneycombGame {
         // Generate the array representing fruits and honeycombs
         char[] fruitsAndHoneycombs = generateFruitsAndHoneycombs(totalItems, honeycombs);
         System.out.println("Fruits and Honeycombs:");
+        displayGameState(fruitsAndHoneycombs);
+
+        int playerPoints = 0;
+        int aiPoints = 0;
+
+        // Game loop
+        while (totalItems > 0) {
+            // Player's turn
+            System.out.println("Player's turn:");
+            int playerChoice = getPlayerInput(scanner);
+            totalItems -= playerChoice;
+            removeItems(fruitsAndHoneycombs, playerChoice);
+            playerPoints += playerChoice;
+            displayGameState(fruitsAndHoneycombs);
+            if (totalItems <= 0) break;
+
+            // AI's turn
+            System.out.println("AI's turn:");
+            int aiChoice = minimax(totalItems, true);
+            System.out.println("AI chooses to remove " + aiChoice + " item(s).");
+            totalItems -= aiChoice;
+            removeItems(fruitsAndHoneycombs, aiChoice);
+            aiPoints += aiChoice;
+            displayGameState(fruitsAndHoneycombs);
+        }
+
+        // Display points and winner
+        System.out.println("Player points: " + playerPoints);
+        System.out.println("AI points: " + aiPoints);
+        if (playerPoints > aiPoints) {
+            System.out.println("Player wins!");
+        } else if (playerPoints < aiPoints) {
+            System.out.println("AI wins!");
+        } else {
+            System.out.println("It's a tie!");
+        }
+    }
+
+    private static int getPlayerInput(Scanner scanner) {
+        System.out.println("Enter 1 or 2 to remove that many items:");
+        int choice;
+        do {
+            choice = scanner.nextInt();
+        } while (choice < 1 || choice > 2);
+        return choice;
+    }
+
+    private static void displayGameState(char[] fruitsAndHoneycombs) {
+        System.out.println("Fruits and Honeycombs:");
         for (char item : fruitsAndHoneycombs) {
             System.out.print(item + " ");
         }
         System.out.println();
+    }
 
-        int result = minimax(totalItems - honeycombs, true);
-        System.out.println("The optimal outcome for the AI player is to collect " + result + " fruits.");
+    private static void removeItems(char[] array, int count) {
+        for (int i = 0; i < array.length && count > 0; i++) {
+            if (array[i] != ' ') {
+                array[i] = ' '; // Mark as removed
+                count--;
+            }
+        }
     }
 
     private static char[] generateFruitsAndHoneycombs(int totalItems, int honeycombs) {
@@ -78,4 +135,3 @@ public class HoneycombGame {
         }
     }
 }
-

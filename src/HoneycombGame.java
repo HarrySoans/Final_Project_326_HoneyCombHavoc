@@ -2,7 +2,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class HoneycombGame {
-    private static final int INFINITY = Integer.MAX_VALUE;
     private static final int HONEYCOMB_PENALTY = -1;
 
     static Random random = new Random();
@@ -31,9 +30,9 @@ public class HoneycombGame {
             // Player's turn
             System.out.println("Player's turn:");
             int playerChoice = getPlayerInput(scanner, fruitsAndHoneycombs);
+            playerPoints += pointCount(playerChoice, fruitsAndHoneycombs);
             totalItems -= playerChoice;
             removeItems(fruitsAndHoneycombs, playerChoice);
-            playerPoints += playerChoice;
             displayGameState(fruitsAndHoneycombs);
             if (isGameEnded(fruitsAndHoneycombs)) break;
 
@@ -41,9 +40,9 @@ public class HoneycombGame {
             System.out.println("AI's turn:");
             int aiChoice = minimax(totalItems, true);
             System.out.println("AI chooses to remove " + aiChoice + " item(s).");
+            aiPoints += pointCount(aiChoice, fruitsAndHoneycombs);
             totalItems -= aiChoice;
             removeItems(fruitsAndHoneycombs, aiChoice);
-            aiPoints += aiChoice;
             displayGameState(fruitsAndHoneycombs);
         }
 
@@ -57,6 +56,26 @@ public class HoneycombGame {
         } else {
             System.out.println("It's a tie!");
         }
+    }
+
+    private static int pointCount(int playerChoice, char[] fruitsAndHoneycombs) {
+        int pointsGained = 0;
+        int position = 0;
+        for(int i =0; i<playerChoice; i++){
+            while(fruitsAndHoneycombs[position] == ' '){
+                position ++;
+            }
+            if(fruitsAndHoneycombs[position] == 'O'){
+                pointsGained++;
+            }
+            if(fruitsAndHoneycombs[position] == 'X'){
+                pointsGained += HONEYCOMB_PENALTY;
+            }
+            if(i == 0){
+                position++;
+            }
+        }
+        return pointsGained;
     }
 
     private static int getPlayerInput(Scanner scanner, char[] fruitsAndHoneycombs) {
@@ -129,7 +148,7 @@ public class HoneycombGame {
 
         // If the maximizing player's turn
         if (isMaximizingPlayer) {
-            int maxScore = -INFINITY;
+            int maxScore = Integer.MIN_VALUE;
             for (int i = 1; i <= 2; i++) {
                 if (itemsLeft - i >= 0) {
                     int score = minimax(itemsLeft - i, false);
@@ -139,7 +158,7 @@ public class HoneycombGame {
             return maxScore;
         } else {
             // If the minimizing player's turn
-            int minScore = INFINITY;
+            int minScore = Integer.MAX_VALUE;
             for (int i = 1; i <= 2; i++) {
                 if (itemsLeft - i >= 0) {
                     int score = minimax(itemsLeft - i, true);

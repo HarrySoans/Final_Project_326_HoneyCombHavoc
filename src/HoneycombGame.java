@@ -38,7 +38,7 @@ public class HoneycombGame {
 
             // AI's turn
             System.out.println("AI's turn:");
-            int aiChoice = minimax(totalItems, true);
+            int aiChoice = minimax(totalItems, true, fruitsAndHoneycombs);
             System.out.println("AI chooses to remove " + aiChoice + " item(s).");
             aiPoints += pointCount(aiChoice, fruitsAndHoneycombs);
             totalItems -= aiChoice;
@@ -140,7 +140,9 @@ public class HoneycombGame {
         return fruitsAndHoneycombs;
     }
 
-    private static int minimax(int itemsLeft, boolean isMaximizingPlayer) {
+    private static int minimax(int itemsLeft, boolean isMaximizingPlayer, char[] fruitsAndHoneycombs) {
+        int potentialScore = 0;
+        int bestMove = 1;
         if (itemsLeft <= 0) {
             // Base case: no items left, return 0
             return 0;
@@ -151,25 +153,33 @@ public class HoneycombGame {
             int maxScore = Integer.MIN_VALUE;
             for (int i = 1; i <= 2; i++) {
                 if (itemsLeft - i >= 0) {
-                    int score = minimax(itemsLeft - i, false);
-                    maxScore = Math.max(maxScore, score);
+                    if(pointCount(i,fruitsAndHoneycombs) > potentialScore) {
+                        potentialScore = pointCount(i, fruitsAndHoneycombs); //ensure player maximizes potential score
+                        bestMove = i; //chooses either 1 or 2, depending on what maximized their potential score
+                    }
+                    int competition = minimax(itemsLeft - i, false, fruitsAndHoneycombs);
+                    System.out.println("Score (min player): " + competition);
+                    maxScore = Math.max(maxScore, competition);
+                    System.out.println("Max Score: " +maxScore);
                 }
             }
-            return maxScore;
+            return bestMove;
         } else {
             // If the minimizing player's turn
             int minScore = Integer.MAX_VALUE;
             for (int i = 1; i <= 2; i++) {
                 if (itemsLeft - i >= 0) {
-                    int score = minimax(itemsLeft - i, true);
-                    if (itemsLeft - i == 0) {
-                        // Penalty for collecting a honeycomb
-                        score += HONEYCOMB_PENALTY;
+                    if(pointCount(i,fruitsAndHoneycombs) < potentialScore) {
+                        potentialScore = pointCount(i, fruitsAndHoneycombs); //still maximizing their potential score
+                        bestMove = i; //chooses either 1 or 2, depending on what maximized their potential score
                     }
-                    minScore = Math.min(minScore, score);
+                    int competition = minimax(itemsLeft - i, true, fruitsAndHoneycombs);
+                    System.out.println("Score (max player): " + competition);
+                    minScore = Math.min(minScore, competition);
+                    System.out.println("Min Score: " + minScore);
                 }
             }
-            return minScore;
+            return bestMove;
         }
     }
 }
